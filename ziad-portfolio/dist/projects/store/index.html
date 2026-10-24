@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MedSupply Store — catalogue + cart demo | Ziad Aref</title>
+<meta name="description" content="A hand-coded medical supplies store with live search, category and price filtering, sorting and a persistent cart written in vanilla JavaScript.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%237aa2ff'/><path d='M9 12h14l-1.5 12h-11z' fill='none' stroke='%23081020' stroke-width='2'/><path d='M12 12V9a4 4 0 0 1 8 0v3' fill='none' stroke='%23081020' stroke-width='2'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/styles.css">
+<link rel="stylesheet" href="../../assets/project.css">
+<link rel="stylesheet" href="style.css">
+<script src="../../assets/theme.js"></script>
+</head>
+<body class="app demo">
+
+<div class="demo-bar">
+  <a class="app-bar__back" href="../../index.html#projects">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+    Portfolio
+  </a>
+  <span class="app-bar__title"><strong>MedSupply Store</strong><small>Project 03 · shop + cart</small></span>
+  <span class="demo-bar__note">Front-end demo · no payment</span>
+  <div class="app-bar__actions">
+    <button class="icon-btn js-theme-toggle" type="button" aria-label="Switch colour theme">
+      <svg class="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
+      <svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+    </button>
+  </div>
+</div>
+
+<div class="site-nav">
+  <a class="logo" href="#top">Med<span>Supply</span></a>
+  <nav aria-label="Demo navigation">
+    <ul class="logo__links" id="navLinks">
+      <li><a href="#shop">Catalogue</a></li>
+      <li><a href="#delivery">Delivery</a></li>
+    </ul>
+  </nav>
+  <button class="btn btn--primary btn--sm cart-btn" id="cartOpen" type="button" aria-haspopup="dialog" aria-expanded="false">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6h15l-1.6 9H7.4z"/><path d="M6 6 5 3H2"/><circle cx="9" cy="20" r="1.6"/><circle cx="18" cy="20" r="1.6"/></svg>
+    Cart <span class="cart-count" id="cartCount">0</span>
+  </button>
+  <button class="icon-btn nav-burger" id="navBurger" type="button" aria-expanded="false" aria-label="Toggle menu">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+  </button>
+</div>
+
+<main id="top">
+
+  <header class="store-hero">
+    <div class="store-hero__inner">
+      <p class="tag">Cairo · Giza · shipped same day · pharmacy-grade stock</p>
+      <h1>Medical supplies, <em>ordered like groceries.</em></h1>
+      <p class="store-hero__lead">
+        Devices, consumables and home-care equipment for clinics, labs and households. Search the
+        catalogue, filter by category and price, and the cart below remembers everything even after a refresh.
+      </p>
+      <ul class="store-hero__perks">
+        <li><strong>18</strong> products listed</li>
+        <li><strong>5</strong> supply categories</li>
+        <li><strong>24 h</strong> delivery in Cairo</li>
+      </ul>
+    </div>
+  </header>
+
+  <section class="shop" id="shop">
+    <!-- filters -->
+    <aside class="side" aria-label="Filters">
+      <div class="side__head">
+        <h2>Filters</h2>
+        <button class="link-btn" id="resetBtn" type="button">Reset all</button>
+      </div>
+
+      <label class="control">
+        <span>Search</span>
+        <input id="q" type="search" placeholder="thermometer, gloves, oximeter…" autocomplete="off">
+      </label>
+
+      <fieldset class="side__group">
+        <legend>Category</legend>
+        <div class="cats" id="cats"></div>
+      </fieldset>
+
+      <div class="side__group">
+        <label class="side__label" for="maxPrice">Max price <b id="maxPriceOut">EGP 9 500</b></label>
+        <input id="maxPrice" type="range" min="0" max="9500" step="50" value="9500">
+        <div class="range-scale"><span>0</span><span>9 500</span></div>
+      </div>
+
+      <label class="check">
+        <input type="checkbox" id="inStockOnly">
+        <span></span> Hide out-of-stock items
+      </label>
+
+      <label class="check">
+        <input type="checkbox" id="promoOnly">
+        <span></span> Only discounted items
+      </label>
+
+      <p class="side__note" id="stockNote" role="status"></p>
+    </aside>
+
+    <!-- results -->
+    <div class="results">
+      <div class="toolbar">
+        <p class="toolbar__count" id="resultCount" role="status">—</p>
+        <label class="sort">
+          <span>Sort</span>
+          <select id="sort">
+            <option value="pop">Most popular</option>
+            <option value="low">Price: low to high</option>
+            <option value="high">Price: high to low</option>
+            <option value="name">Name A–Z</option>
+          </select>
+        </label>
+      </div>
+      <div class="grid" id="grid"></div>
+    </div>
+  </section>
+
+  <section class="strip" id="delivery">
+    <div class="strip__card">
+      <h2>Delivery &amp; payment</h2>
+      <p>Cairo and Giza within 24 hours, other governorates 2–4 days. InstaPay, card at the door or
+        cash on delivery. Bulk pricing for clinics from 10 units of the same item.</p>
+    </div>
+    <div class="strip__card">
+      <h2>Returns</h2>
+      <p>Sealed consumables return within 14 days. Devices carry a 12-month warranty handled in-house —
+        bring the invoice or give us the order number.</p>
+    </div>
+    <div class="strip__card">
+      <h2>This is a demo</h2>
+      <p>No payment is taken and no order leaves your browser. The cart lives in
+        <code>localStorage</code> on this device only.</p>
+    </div>
+  </section>
+</main>
+
+<!-- cart drawer -->
+<div class="scrim" id="scrim" hidden></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle" aria-hidden="true">
+  <header class="drawer__head">
+    <h2 id="drawerTitle">Your cart</h2>
+    <button class="icon-btn" id="cartClose" type="button" aria-label="Close cart">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+  </header>
+  <div class="drawer__body" id="cartBody"></div>
+  <footer class="drawer__foot">
+    <dl class="totals">
+      <div><dt>Subtotal</dt><dd id="sub">EGP 0</dd></div>
+      <div><dt>Delivery</dt><dd id="ship">EGP 0</dd></div>
+      <div><dt>VAT 14%</dt><dd id="vat">EGP 0</dd></div>
+      <div class="totals__grand"><dt>Total</dt><dd id="total">EGP 0</dd></div>
+    </dl>
+    <p class="free-tip" id="freeTip"></p>
+    <button class="btn btn--primary btn--block" id="checkout" type="button">Checkout</button>
+    <button class="link-btn drawer__clear" id="clearCart" type="button">Empty the cart</button>
+  </footer>
+</aside>
+
+<footer class="app-footer">
+  Demo storefront built by Ziad Mohammed Aref — filtering, sorting and a persistent cart in vanilla
+  JavaScript. The catalogue is hard-coded and "checkout" only writes to <code>localStorage</code>: no
+  order, payment or stock system is connected. <a href="../../index.html">Back to portfolio</a>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
